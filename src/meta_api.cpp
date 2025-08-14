@@ -10,7 +10,7 @@ std::unique_ptr<BacktrackDetector> backtrack_detector;
 plugin_info_t Plugin_info = {
     META_INTERFACE_VERSION,                                    // ifvers
     "Backtrack Detector",                                      // name
-    "1.0.0",                                                   // version
+    "1.0.1",                                                   // version
     __DATE__,                                                  // date
     "loncu",                                                   // author
     "https://github.com/fourfourfourf0ur/backtrack_detector",  // url

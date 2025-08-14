@@ -31,7 +31,7 @@ char* BacktrackDetector::PrepareCmdForExecute(IGameClient* client) {
   if (cmd[0] != '\0') {
     const auto length = std::strlen(cmd);
     if (length < sizeof(cmd) - 2)
-      strcat(cmd, "\n");
+      std::strcat(cmd, "\n");
     else
       cmd[length - 1] = '\n';
   }
@@ -42,10 +42,11 @@ char* BacktrackDetector::PrepareCmdForExecute(IGameClient* client) {
 void BacktrackDetector::HandleNetCommand(IRehldsHook_HandleNetCommand* chain,
                                          IGameClient* client, int8 opcode) {
   chain->callNext(client, opcode);
-  if (opcode == clc_move && client->GetEdict()->v.deadflag == DEAD_NO) {
+  const auto edict = client->GetEdict();
+  if (opcode == clc_move && edict != nullptr && edict->v.deadflag == DEAD_NO) {
     const auto id = client->GetId();
     const auto host_client = g_RehldsSvs->GetClient_t(id);
-    if (host_client->fully_connected) {
+    if (host_client != nullptr && host_client->fully_connected) {
       if (host_client->netchan.incoming_acknowledged < last_acknowledged_[id]) {
         const auto cmd_to_execute = PrepareCmdForExecute(client);
         if (cmd_to_execute && cmd_to_execute[0] != '\0' && !is_punished_[id]) {
@@ -80,8 +81,8 @@ BacktrackDetector::BacktrackDetector() {
   if (pos) *(pos + 1) = '\0';
 
   char execute_config_cmd[MAX_PATH];
-  snprintf(execute_config_cmd, sizeof(execute_config_cmd), "exec \"%s%s\"\n",
-           relative_path, CFG_FILE);
+  std::snprintf(execute_config_cmd, sizeof(execute_config_cmd),
+                "exec \"%s%s\"\n", relative_path, CFG_FILE);
   SERVER_COMMAND(execute_config_cmd);
   SERVER_EXECUTE();
 
